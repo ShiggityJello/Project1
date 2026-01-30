@@ -1,0 +1,5 @@
+{"ts":"2026-01-30T05:00:01Z","level":"INFO","msg":"service started","src_ip":"10.0.0.5"}
+{"ts":"2026-01-30T05:00:02Z","level":"WARN","msg":"login failed","src_ip":"10.0.0.8"}
+{"ts":"2026-01-30T05:00:03Z","level":"WARN","msg":"login failed","src_ip":"10.0.0.8"}
+{"ts":"2026-01-30T05:00:04Z","level":"ERROR","msg":"blocked by policy","src_ip":"10.0.0.9"}
+{"ts":"2026-01-30T05:00:05Z","level":"INFO","msg":"heartbeat","src_ip":"10.0.0.5"}
