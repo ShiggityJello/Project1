@@ -1,0 +1,15 @@
+{
+  "counts_by_level": {
+    "ERROR": 1,
+    "INFO": 2,
+    "WARN": 2
+  },
+  "filters": {
+    "contains": null,
+    "since": null,
+    "src_ip": null,
+    "strict": false,
+    "until": null
+  },
+  "path": "data/sample.log"
+}
