@@ -10,7 +10,7 @@ import csv
 def emit(text: str, out_path: Optional[str]) -> None:
     """
     Output helper function that writes text to either a file or stdout.
-    
+
     Args:
         text: The text content to output
         out_path: File path to write to, or None to print to stdout
@@ -26,14 +26,14 @@ def emit(text: str, out_path: Optional[str]) -> None:
 def main() -> int:
     """
     Main entry point for the LogKit CLI application.
-    
+
     Responsibilities:
     1. Parse and validate command-line arguments
     2. Load and filter log events from the specified file
     3. Aggregate log counts by level and optionally by source IP
     4. Generate output in requested format (text, JSON, or CSV)
     5. Write to file or stdout as specified
-    
+
     Returns:
         0 on success, non-zero on error
     """
@@ -41,10 +41,10 @@ def main() -> int:
     # Configure command-line argument parser with all available options
     ap = argparse.ArgumentParser(
         description="Count log events by level (line-delimited JSON).")
-    
+
     # Positional argument: path to log file
     ap.add_argument("path", help="Path to log file")
-    
+
     # Optional filtering arguments
     ap.add_argument(
         "--src-ip", help="Filter to a single source IP", default=None)
@@ -62,7 +62,7 @@ def main() -> int:
         default=None,
         help="Only include events at/before this timestamp (ISO8601, e.g. 2026-01-30T05:00:04Z)",
     )
-    
+
     # Output format and destination arguments
     ap.add_argument("--json", action="store_true",
                     help="Output results as JSON")
@@ -70,7 +70,7 @@ def main() -> int:
                     help="Write output to this file instead of stdout")
     ap.add_argument("--quiet", action="store_true",
                     help="Do not print text output (useful when writing files)")
-    
+
     # Top source IPs arguments
     ap.add_argument("--top-src", type=int, default=0,
                     help="Show top N source IPs (0 disables)")
@@ -79,7 +79,7 @@ def main() -> int:
 
     # Parse arguments from command line
     args = ap.parse_args()
-    
+
     # ==================== ARGUMENT VALIDATION ====================
     # If CSV output is requested but no top-src count specified, default to 5
     if args.top_src_csv and args.top_src == 0:
@@ -134,7 +134,7 @@ def main() -> int:
                 contains=args.contains,
             )
         ]
-        
+
         # If CSV output requested, write top source IPs to CSV file
         if args.top_src_csv:
             with open(args.top_src_csv, "w", newline="", encoding="utf-8") as f:
@@ -151,10 +151,10 @@ def main() -> int:
     # ==================== STEP 5: TEXT OUTPUT MODE ====================
     # Format results as human-readable text output
     lines: list[str] = []
-    
+
     # Calculate column width for alignment based on longest log level name
     width = max(len(k) for k in counts)
-    
+
     # Build text lines with log levels and their counts, sorted alphabetically
     for level in sorted(counts):
         lines.append(f"{level:<{width}}  {counts[level]}")

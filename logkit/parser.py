@@ -10,7 +10,7 @@ from typing import Iterable, Optional
 class Event:
     """
     Represents a single log event parsed from a JSON log file.
-    
+
     Immutable data class with the following fields:
     - ts: Timestamp in ISO8601 format (e.g., "2026-01-30T05:00:01Z")
     - level: Log level (e.g., "INFO", "WARN", "ERROR")
@@ -31,23 +31,23 @@ def iter_events(
 ) -> Iterable[Event]:
     """
     Generator function that reads and parses a line-delimited JSON log file.
-    
+
     Yields Event objects after applying optional timestamp range filters.
     Uses lazy evaluation (generator pattern) for memory efficiency with large files.
-    
+
     Args:
         path: Path to the log file to parse
         strict: If True, raise ValueError on first malformed JSON. If False, skip bad lines.
         since: Optional ISO8601 timestamp; only yield events at/after this time
         until: Optional ISO8601 timestamp; only yield events at/before this time
-    
+
     Yields:
         Event objects matching the filter criteria
-    
+
     Raises:
         ValueError: If strict=True and a line contains invalid JSON
         FileNotFoundError: If the specified log file does not exist
-    
+
     Example:
         for event in iter_events("logs.jsonl", since="2026-01-30T00:00:00Z"):
             print(f"{event.level}: {event.msg}")
@@ -63,11 +63,11 @@ def iter_events(
         for line_no, line in enumerate(f, start=1):
             # Remove leading/trailing whitespace from line
             line = line.strip()
-            
+
             # Skip empty lines
             if not line:
                 continue
-            
+
             # ==================== PARSE JSON LINE ====================
             try:
                 # Attempt to parse line as JSON object
@@ -81,21 +81,21 @@ def iter_events(
                     msg=str(obj.get("msg", "")),
                     src_ip=str(obj.get("src_ip", "")),
                 )
-                
+
                 # ==================== APPLY TIMESTAMP RANGE FILTERS ====================
                 # If timestamp filters are specified, check if event falls within range
                 if since_dt or until_dt:
                     # Skip events without timestamps when filtering by time
                     if not ev.ts:
                         continue
-                    
+
                     # Parse event timestamp for comparison
                     ev_ts = parse_ts(ev.ts)
-                    
+
                     # Skip if event is before the "since" cutoff
                     if since_dt and ev_ts < since_dt:
                         continue
-                    
+
                     # Skip if event is after the "until" cutoff
                     if until_dt and ev_ts > until_dt:
                         continue
@@ -103,7 +103,7 @@ def iter_events(
                 # ==================== YIELD FILTERED EVENT ====================
                 # Yield event that passes all filter criteria
                 yield ev
-                
+
             # ==================== ERROR HANDLING ====================
             except json.JSONDecodeError as e:
                 # In strict mode, raise an error immediately on malformed JSON
@@ -121,18 +121,18 @@ def count_by_level(
 ) -> dict[str, int]:
     """
     Aggregates events by log level, with optional filtering by source IP and message content.
-    
+
     Consumes the provided event iterable and returns a dictionary mapping each log level
     to the count of events at that level matching the specified filters.
-    
+
     Args:
         events: Iterable of Event objects to aggregate
         src_ip: Optional source IP address to filter by (exact match)
         contains: Optional substring to search for in message text (case-insensitive)
-    
+
     Returns:
         Dictionary mapping log level strings to count integers
-    
+
     Example:
         counts = count_by_level(iter_events("logs.jsonl"), src_ip="10.0.0.5")
         print(f"INFO events: {counts.get('INFO', 0)}")
@@ -158,7 +158,7 @@ def count_by_level(
     """
     # Pre-process the search string for case-insensitive substring matching
     needle = contains.lower() if contains else None
-    
+
     # Initialize dictionary to count occurrences of each source IP
     counts: dict[str, int] = {}
 
@@ -168,7 +168,7 @@ def count_by_level(
         # Skip events whose messages don't contain the search string
         if needle and needle not in ev.msg.lower():
             continue
-        
+
         # ==================== INCREMENT IP COUNT ====================
         # Increment counter for this source IP (initialize to 0 if first occurrence)
         counts[ev.src_ip] = counts.get(ev.src_ip, 0) + 1
@@ -206,12 +206,12 @@ def count_by_level(
     # ISO8601 format allows both representations, but Python's parser expects the latter
     if ts.endswith("Z"):
         ts = ts[:-1] + "+00:00"
-    
+
     # ==================== PARSE AND RETURN ====================
     # Parse the normalized ISO8601 string and convert to UTC timezone filter is specified and message doesn't contain needle
         if needle and needle not in ev.msg.lower():
             continue
-        
+
         # ==================== ACCUMULATE COUNT ====================
         # Increment count for this log level (initialize to 0 if first occurrence)
         counts[ev.level] = counts.get(ev.level, 0) + 1
